@@ -1,0 +1,119 @@
+/* Colores por tipo de evento; el texto del chip siempre dice qué es. */
+:root {
+  --tipo-cita: #b42318;
+  --tipo-cumple: #7a3ea1;
+  --tipo-reunion: #1d5fa8;
+  --tipo-plan: #0f766e;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --tipo-cita: #f97066;
+    --tipo-cumple: #d6a4f0;
+    --tipo-reunion: #7ab4f5;
+    --tipo-plan: #5eead4;
+  }
+}
+
+.cal-barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.cal-nav { display: flex; gap: 0.35rem; }
+.cal-titulo { margin: 0; text-transform: capitalize; flex: 1; text-align: center; min-width: 140px; }
+
+.cal-cabecera {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  color: var(--tinta-suave);
+  font-size: 0.85rem;
+  padding-bottom: 0.25rem;
+}
+
+.cal-rejilla {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  background: var(--linea);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.cal-dia {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-height: 84px;
+  padding: 4px;
+  text-align: left;
+  background: var(--superficie);
+  color: var(--tinta);
+  border: 0;
+  border-radius: 0;
+  font-weight: 400;
+  overflow: hidden;
+}
+.cal-rejilla.semana .cal-dia { min-height: 150px; }
+.cal-dia.fuera { opacity: 0.45; }
+.cal-dia.elegido { outline: 3px solid var(--acento); outline-offset: -3px; }
+
+.cal-num { font-size: 0.9rem; font-weight: 700; width: 1.7rem; height: 1.7rem; line-height: 1.7rem; text-align: center; border-radius: 50%; }
+.cal-dia.hoy .cal-num { background: var(--acento); color: var(--acento-texto); }
+
+.ev-chip {
+  display: block;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border-left: 3px solid currentColor;
+  background: var(--fondo);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ev-mas { font-size: 0.72rem; color: var(--tinta-suave); }
+
+.tipo-cita { color: var(--tipo-cita); }
+.tipo-cumple { color: var(--tipo-cumple); }
+.tipo-reunion { color: var(--tipo-reunion); }
+.ev-chip.tipo-cita, .ev-chip.tipo-cumple, .ev-chip.tipo-reunion { color: var(--tinta); border-left-color: currentColor; }
+.ev-chip.tipo-cita { border-left-color: var(--tipo-cita); }
+.ev-chip.tipo-cumple { border-left-color: var(--tipo-cumple); }
+.ev-chip.tipo-reunion { border-left-color: var(--tipo-reunion); }
+
+.etiqueta { font-weight: 700; }
+
+label.check { display: flex; align-items: center; gap: 0.5rem; color: var(--tinta); font-size: 1rem; }
+label.check input { width: 22px; height: 22px; min-height: 0; accent-color: var(--acento); }
+
+.tabla-scroll { overflow-x: auto; }
+
+/* Móvil: la semana pasa a una columna por día. */
+@media (max-width: 640px) {
+  .cal-rejilla.semana { grid-template-columns: 1fr; }
+  .cal-rejilla.semana .cal-dia { min-height: 0; }
+  .cal-rejilla:not(.semana) .cal-dia { min-height: 64px; }
+  .cal-rejilla:not(.semana) .ev-chip { font-size: 0; height: 6px; padding: 0; border-radius: 3px; }
+  .cal-rejilla:not(.semana) .ev-mas { display: none; }
+}
+
+@media (max-width: 640px) {
+  .cal-cabecera:has(+ .cal-rejilla.semana) { display: none; }
+  .cal-rejilla:not(.semana) .ev-chip { border-left: 0; }
+  .cal-rejilla:not(.semana) .ev-chip.tipo-cita { background: var(--tipo-cita); }
+  .cal-rejilla:not(.semana) .ev-chip.tipo-cumple { background: var(--tipo-cumple); }
+  .cal-rejilla:not(.semana) .ev-chip.tipo-reunion { background: var(--tipo-reunion); }
+}
+
+.tipo-plan { color: var(--tipo-plan); }
+.ev-chip.tipo-plan { color: var(--tinta); border-left-color: var(--tipo-plan); }
+@media (max-width: 640px) {
+  .cal-rejilla:not(.semana) .ev-chip.tipo-plan { background: var(--tipo-plan); }
+}

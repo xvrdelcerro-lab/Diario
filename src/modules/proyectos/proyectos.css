@@ -1,0 +1,34 @@
+/* Usa también .chip, .filtros, .encabezado y .fila, definidos en pendientes.css. */
+
+.proyectos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+
+.proyecto {
+  display: grid;
+  gap: 0.6rem;
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 0.75rem;
+}
+.proyecto.hecho strong { text-decoration: line-through; color: var(--tinta-suave); }
+
+.proyecto-cabeza small {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  color: var(--tinta-suave);
+}
+
+.estado { font-weight: 700; }
+.estado-idea { color: var(--alerta); }
+.estado-programado { color: var(--acento); }
+.estado-hecho { color: var(--tinta-suave); }
+.aviso-perdido { color: var(--peligro); font-weight: 700; }
+
+.proyecto .acciones { flex-wrap: wrap; }
+
+.programar {
+  display: grid;
+  gap: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--linea);
+}

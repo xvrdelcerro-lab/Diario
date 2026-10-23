@@ -1,0 +1,79 @@
+select {
+  font: inherit;
+  color: var(--tinta);
+  background: var(--fondo);
+  border: 1px solid var(--linea);
+  border-radius: 6px;
+  padding: 0.55rem 0.7rem;
+  min-height: 44px;
+}
+
+.fila { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.fila > label { flex: 1 1 160px; }
+
+.encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.75rem;
+}
+.encabezado h2 { margin: 0; }
+
+.filtros { display: flex; gap: 0.35rem; }
+.chip {
+  background: transparent;
+  color: var(--tinta);
+  border: 1px solid var(--linea);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+  min-height: 36px;
+  font-weight: 400;
+}
+.chip.activo { background: var(--acento); color: var(--acento-texto); border-color: var(--acento); font-weight: 700; }
+
+.tareas { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.6rem; }
+.tarea {
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+}
+.tarea.hecha .tarea-texto strong { text-decoration: line-through; color: var(--tinta-suave); }
+
+.tarea-linea { display: flex; align-items: center; gap: 0.75rem; }
+.tarea-linea input[type="checkbox"],
+.sub-check input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  min-height: 0;
+  padding: 0;
+  accent-color: var(--acento);
+  flex: none;
+}
+.tarea-texto { flex: 1; min-width: 0; }
+.tarea-texto small { display: flex; gap: 0.75rem; flex-wrap: wrap; color: var(--tinta-suave); }
+
+.prio { font-weight: 700; }
+.prio-alta { color: var(--peligro); }
+.prio-media { color: var(--alerta); }
+.prio-baja { color: var(--acento); }
+.vencida { color: var(--peligro); font-weight: 700; }
+
+.subs { list-style: none; margin: 0.6rem 0 0 2.2rem; padding: 0; display: grid; gap: 0.25rem; }
+.subs li { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; }
+.subs li.hecha .sub-check { text-decoration: line-through; color: var(--tinta-suave); }
+.sub-check { display: flex; align-items: center; gap: 0.5rem; color: var(--tinta); font-size: 1rem; }
+
+.sub-nueva { display: flex; gap: 0.5rem; margin: 0.6rem 0 0 2.2rem; }
+.sub-nueva input { flex: 1; min-width: 0; }
+
+button.mini {
+  background: transparent;
+  color: var(--tinta-suave);
+  border: 0;
+  min-height: 32px;
+  padding: 0.2rem 0.5rem;
+  font-weight: 400;
+  text-decoration: underline;
+}
