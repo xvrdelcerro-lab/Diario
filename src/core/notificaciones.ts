@@ -28,16 +28,43 @@ export async function abrirAjusteAlarmasExactas() {
   await LocalNotifications.changeExactNotificationSetting();
 }
 
+export interface ResultadoProgramacion {
+  cuando: number;
+  total: number;
+  aviso: string | null;
+  error: string | null;
+}
+
+// Resultado del último intento de programar, para mostrarlo en el panel de estado.
+let ultimo: ResultadoProgramacion | null = null;
+export const ultimaProgramacion = () => ultimo;
+const anotar = (total: number, aviso: string | null = null, error: string | null = null) => {
+  ultimo = { cuando: Date.now(), total, aviso, error };
+};
+
+// Una sola reprogramación a la vez: evita que dos corridas simultáneas se pisen.
+let cola: Promise<void> = Promise.resolve();
+
 /**
  * Borra las alarmas pendientes y programa las próximas tomas de todas las
  * medicinas activas. Llámala al abrir la app y cada vez que cambie la lista.
  * En web (navegador) no hace nada: allí no hay alarmas con la app cerrada.
  */
-export async function reprogramarAlarmas(meds: Medicina[]) {
+export function reprogramarAlarmas(meds: Medicina[]): Promise<void> {
+  cola = cola
+    .then(() => reprogramar(meds))
+    .catch((e) => anotar(0, null, e instanceof Error ? e.message : String(e)));
+  return cola;
+}
+
+async function reprogramar(meds: Medicina[]) {
   if (!Capacitor.isNativePlatform()) return;
 
   const permiso = await LocalNotifications.requestPermissions();
-  if (permiso.display !== "granted") return;
+  if (permiso.display !== "granted") {
+    anotar(0, "Sin permiso de notificaciones: no se programó nada.");
+    return;
+  }
   await asegurarCanal();
 
   const pendientes = await LocalNotifications.getPending();
@@ -56,9 +83,12 @@ export async function reprogramarAlarmas(meds: Medicina[]) {
     .sort((a, b) => a.t - b.t)
     .slice(0, MAX_NOTIFICACIONES);
 
-  if (proximas.length === 0) return;
+  if (proximas.length === 0) {
+    anotar(0, "No hay tomas futuras en los próximos 7 días.");
+    return;
+  }
 
-  await LocalNotifications.schedule({
+  const r = await LocalNotifications.schedule({
     notifications: proximas.map(({ m, t }) => ({
       id: idNotificacion(m.id, t),
       title: `💊 ${m.nombre}`,
@@ -68,6 +98,11 @@ export async function reprogramarAlarmas(meds: Medicina[]) {
       extra: { medicinaId: m.id },
     })),
   });
+
+  anotar(
+    proximas.length,
+    r.warning ? "Android las programó sin hora exacta: pueden retrasarse unos minutos." : null
+  );
 }
 
 // Canal de máxima importancia: la notificación suena, vibra y aparece sobre la pantalla (Android 8+).
@@ -89,6 +124,7 @@ export interface Diagnostico {
   exactas: PermissionState | "no-aplica";
   pendientes: number;
   proxima: number | null;
+  ultima: ResultadoProgramacion | null;
 }
 
 /** Resume el estado de las alarmas para mostrarlo en pantalla. */
@@ -104,6 +140,7 @@ export async function diagnosticoAlarmas(): Promise<Diagnostico> {
     exactas,
     pendientes: pendientes.notifications.length,
     proxima: tiempos.length > 0 ? Math.min(...tiempos) : null,
+    ultima: ultimo,
   };
 }
 

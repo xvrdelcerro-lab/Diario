@@ -48,7 +48,7 @@ export default function Medicinas() {
   const [nombre, setNombre] = useState("");
   const [dosis, setDosis] = useState("1 tableta");
   const [cadaHoras, setCadaHoras] = useState(8);
-  const [inicio, setInicio] = useState(aInputFecha(Date.now()));
+  const [inicio, setInicio] = useState(() => aInputFecha(Date.now() + 5 * 60000));
 
   // Reporte
   const [desde, setDesde] = useState(aInputDia(Date.now() - 7 * DIA));
@@ -113,6 +113,15 @@ export default function Medicinas() {
   const totalProg = reporte.reduce((s, r) => s + r.programadas, 0);
   const totalTom = reporte.reduce((s, r) => s + r.tomadas, 0);
 
+  // Cuándo sonará la primera alarma con los datos del formulario.
+  const primeraAlarma = useMemo(() => {
+    const t0 = new Date(inicio).getTime();
+    const paso = cadaHoras * 3600000;
+    if (!Number.isFinite(t0) || !(paso > 0)) return null;
+    if (t0 > ahora) return { t: t0, pasada: false };
+    return { t: t0 + (Math.floor((ahora - t0) / paso) + 1) * paso, pasada: true };
+  }, [inicio, cadaHoras, ahora]);
+
   async function guardar(e: FormEvent) {
     e.preventDefault();
     if (!nombre.trim() || cadaHoras <= 0) return;
@@ -123,6 +132,7 @@ export default function Medicinas() {
       horaInicio: new Date(inicio).getTime(),
     });
     setNombre("");
+    setInicio(aInputFecha(Date.now() + 5 * 60000));
   }
 
   return (
@@ -185,6 +195,14 @@ export default function Medicinas() {
               onChange={(e) => setInicio(e.target.value)}
               required
             />
+            {primeraAlarma && (
+              <small className={primeraAlarma.pasada ? "hint aviso" : "hint"}>
+                {primeraAlarma.pasada
+                  ? "Esa hora ya pasó. Con estos datos, la primera alarma sería "
+                  : "La primera alarma sonará "}
+                {formatoHora(primeraAlarma.t)}
+              </small>
+            )}
           </label>
           <button type="submit">Guardar medicina</button>
         </form>

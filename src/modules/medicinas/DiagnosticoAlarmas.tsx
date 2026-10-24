@@ -62,6 +62,20 @@ export default function DiagnosticoAlarmas() {
           <li>Alarmas exactas: <strong>{textoPermiso(d.exactas)}</strong></li>
           <li>Alarmas programadas: <strong>{d.pendientes}</strong></li>
           <li>
+            Última programación:{" "}
+            <strong>
+              {d.ultima
+                ? `${new Date(d.ultima.cuando).toLocaleTimeString("es-MX", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                  })} · ${d.ultima.total} alarma${d.ultima.total === 1 ? "" : "s"}`
+                : "ninguna en esta sesión"}
+            </strong>
+          </li>
+          {d.ultima?.aviso && <li className="hint aviso">{d.ultima.aviso}</li>}
+          {d.ultima?.error && <li className="error">Error: {d.ultima.error}</li>}
+          <li>
             Próxima alarma:{" "}
             <strong>
               {d.proxima

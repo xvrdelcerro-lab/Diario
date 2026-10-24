@@ -14,3 +14,6 @@
 
 .diag { list-style: none; margin: 0 0 0.75rem; padding: 0; display: grid; gap: 0.25rem; }
 .diag-botones { flex-wrap: wrap; }
+
+.hint { color: var(--tinta-suave); }
+.hint.aviso { color: var(--alerta); font-weight: 700; }
