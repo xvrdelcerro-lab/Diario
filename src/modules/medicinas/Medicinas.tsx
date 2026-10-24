@@ -1,7 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useAuth } from "../../core/auth";
-import { reprogramarAlarmas } from "../../core/notificaciones";
+import {
+  abrirAjusteAlarmasExactas,
+  estadoAlarmasExactas,
+  reprogramarAlarmas,
+} from "../../core/notificaciones";
 import {
   crearMedicina,
   dosisProgramadas,
@@ -12,6 +16,8 @@ import {
   suscribirTomas,
 } from "./medicinas.service";
 import type { Medicina, Toma } from "./medicinas.service";
+import DiagnosticoAlarmas from "./DiagnosticoAlarmas";
+import "./medicinas.css";
 
 const DIA = 24 * 3600000;
 
@@ -36,6 +42,7 @@ export default function Medicinas() {
   const [meds, setMeds] = useState<Medicina[]>([]);
   const [tomasRecientes, setTomasRecientes] = useState<Toma[]>([]);
   const [ahora, setAhora] = useState(Date.now());
+  const [exactas, setExactas] = useState<string>("no-aplica");
 
   // Formulario
   const [nombre, setNombre] = useState("");
@@ -61,6 +68,14 @@ export default function Medicinas() {
     () => suscribirTomas(uid, Date.now() - 2 * DIA, Date.now() + DIA, setTomasRecientes),
     [uid]
   );
+
+  // Permiso de alarmas exactas (Android): se vuelve a revisar al regresar a la app.
+  useEffect(() => {
+    const revisar = () => estadoAlarmasExactas().then(setExactas).catch(() => {});
+    revisar();
+    document.addEventListener("visibilitychange", revisar);
+    return () => document.removeEventListener("visibilitychange", revisar);
+  }, []);
 
   // Alarmas del sistema: se reprograman cuando cambia la lista.
   useEffect(() => {
@@ -114,6 +129,15 @@ export default function Medicinas() {
     <div className="modulo">
       <section className="panel">
         <h2>Tomas pendientes</h2>
+        {exactas !== "granted" && exactas !== "no-aplica" && (
+          <div className="aviso-alarma" role="alert">
+            <p>
+              Para que las alarmas suenen a la hora exacta, activa «Alarmas y recordatorios» para esta
+              app.
+            </p>
+            <button onClick={() => abrirAjusteAlarmasExactas()}>Activar</button>
+          </div>
+        )}
         {pendientes.length === 0 ? (
           <p className="vacio">Todo al día. Aquí aparecerán las tomas que toque marcar.</p>
         ) : (
@@ -247,6 +271,8 @@ export default function Medicinas() {
           </>
         )}
       </section>
+
+      <DiagnosticoAlarmas />
     </div>
   );
 }
